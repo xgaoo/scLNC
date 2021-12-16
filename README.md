@@ -1,1 +1,1 @@
-# scLNC.github.io
+# scLNC
