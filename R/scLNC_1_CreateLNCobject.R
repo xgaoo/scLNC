@@ -1,8 +1,8 @@
 
 #' Create a scLNC object for analysis.
 #'
-#' @param count_table1 Gene count matrix.
-#' @param cell_info1 A list of cell information.
+#' @param count_table1 Gene count matrix with cells as columns and features as rows.
+#' @param cell_info1 A list of cell information. A data.frame where the rows are cell names and the columns are cell informations. Row names in the cell_info1 need to match the column names of the count_table1.
 #' @param geneid Boolean values determining if gene names convert to Ensemble IDs. Default is TRUE.
 #' @param create Boolean values determine whether the object is to be created. The default value is TRUE.
 #' @param splitobject Boolean values determine whether objects should be split into items. Default is TRUE.
