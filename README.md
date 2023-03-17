@@ -16,7 +16,7 @@ RNA-seq.
 devtools::install_github("xgaoo/scLNC")
 ```
 
-\##Examples
+## Examples
 
 1.Create a scLNC object for analysis.
 
