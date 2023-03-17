@@ -33,7 +33,7 @@ scLNC_4_Compare <- function(DEtarget=TRUE,ob.ls,lncRNA,
 
   if(DeGO){
 
-    lnc_network(object.list=ob.ls,lncRNA,GO_file=CopareGOfile,genelist=CopareGeneList)
+    lnc_network(object.list=ob.ls,lncRNA,GO_file=CopareGOfile,genelist=CopareGeneList,lncRNA)
   }
 
 

@@ -18,9 +18,9 @@ devtools::install_github("xgaoo/scLNC")
 
 ## Example data
 
-You can download a example data from
+An example data can be downloaded from
 [GEO](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98638) with
-the commands in linux:
+the commands:
 
 ``` r
 wget https://ftp.ncbi.nlm.nih.gov/geo/series/GSE98nnn/GSE98638/suppl/GSE98638_HCC.TCell.S5063.count.txt.gz
@@ -29,26 +29,25 @@ wget https://ftp.ncbi.nlm.nih.gov/geo/series/GSE98nnn/GSE98638/miniml/GSE98638_f
 
 ## Examples
 
-1.  Create a scLNC object for analysis.
+1.  Create a scLNC object first.
 
 ``` r
 LNCobject=scLNC_1_CreateLNCobject (count_table1= HCC_rawcount, cell_info1= HCC_cellinfo)
 ```
 
-2.  Perform calculation, filtration and annotation of lncRNA-mRNA
-    co-expression relationship pairs.
+2.  Build lncRNA units and annotate the lncRNA-mRNA co-expression pairs.
 
 ``` r
 LNCobject=scLNC_2_Relation(objectInput=LNCobject,relation.fileName='HCC',pairs.filter=TRUE,corcut=0.6,anno.pairs=TRUE)
 ```
 
-3.  Calculate lncRNA units activity score.
+3.  Calculate the activity score of lncRNA units.
 
 ``` r
 LNCobject=scLNC_3_Unit (objectInput=LNCobject,AUC=TRUE,displayLncRNA=NULL,DEAUC=TRUE,item.add=NULL,DEitem='majorCluster')
 ```
 
-4.  Compare units from different items.
+4.  Compare lncRNA units from different experimental conditions.
 
 ``` r
 scLNC_4_Compare(DisplayUnit=TRUE,ob.ls,lncRNA,DeGO=TRUE,CopareGOfile,CopareGeneList)

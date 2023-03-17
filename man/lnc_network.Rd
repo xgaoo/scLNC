@@ -4,12 +4,14 @@
 \alias{lnc_network}
 \title{Differences in functional enrichment between the two groups of units.}
 \usage{
-lnc_network(GO_file, genelist)
+lnc_network(GO_file, genelist, lncRNA)
 }
 \arguments{
 \item{GO_file}{Metascape results.}
 
 \item{genelist}{Two mRNA lists from two units.}
+
+\item{lncRNA}{Interesting lncRNA name.}
 }
 \value{
 A network diagram, including differences and same in biological functions and mRNAs.

@@ -5,57 +5,30 @@
 \title{Compare units from different items.}
 \usage{
 scLNC_4_Compare(
-  Activity = TRUE,
-  objectInput,
-  DEitem = "majorCluster",
-  DisplayUnit = TRUE,
-  objectCtrl,
-  objectCondi,
+  DEtarget = TRUE,
+  ob.ls,
   lncRNA,
-  corcutCtrl,
-  corcutCondi,
   DeGO = TRUE,
   CopareGOfile,
   CopareGeneList
 )
 }
 \arguments{
-\item{Activity}{Boolean values determine whether to compare differential activity of units between two groups. The default value is TRUE.}
+\item{DEtarget}{Boolean values determine whether to compare composition of units between two groups. The default value is TRUE.}
 
-\item{objectInput}{A scLNC object with AUC slot.}
-
-\item{DEitem}{ttribute for comparison.}
-
-\item{DisplayUnit}{Boolean values determine whether to compare composition of units between two groups. The default value is TRUE.}
-
-\item{objectCtrl}{A scLNC object of group1.}
-
-\item{objectCondi}{A scLNC object of group2.}
+\item{ob.ls}{A list of objects including two scLNC objects that need to be compared.}
 
 \item{lncRNA}{Interesting lncRNA unit name.}
 
-\item{corcutCtrl}{Top pairs with high correlation coefficient in group1.}
-
-\item{corcutCondi}{Top pairs with high correlation coefficient in group2.}
-
 \item{DeGO}{Boolean values determine whether to compare differences in functional enrichment between the two groups of units. The default value is TRUE.}
 
-\item{CopareGOfile}{GO_file Metascape results.}
+\item{CopareGOfile}{A GO_file Metascape results of two groups.}
 
-\item{CopareGeneList}{genelist Two mRNA lists from two units.}
+\item{CopareGeneList}{A data frame including two mRNA lists from two groups.}
 }
 \value{
-a scLNC object with Differential activity of units slot.
+Corresponding plot.
 }
 \description{
 Compare units from different items.
-}
-\examples{
-\dontrun{
-data(LNCobject)
-LNCobject=scLNC_3_Unit (objectInput=LNCobject,AUC=TRUE,displayLncRNA=NULL)
-LNCobject=scLNC_4_Compare(Activity=TRUE,objectInput=LNCobject,
-DEitem='majorCluster',DisplayUnit=FALSE,DeGO=FALSE)
-}
-
 }

@@ -8,8 +8,9 @@ scLNC_3_Unit(
   objectInput,
   AUC = TRUE,
   displayLncRNA = NULL,
-  Go = FALSE,
-  MetascapeGofile
+  DEAUC = TRUE,
+  item.add = NULL,
+  DEitem = "majorCluster"
 )
 }
 \arguments{
@@ -19,9 +20,11 @@ scLNC_3_Unit(
 
 \item{displayLncRNA}{lncRNA list. Only keep a subset of lncRNA units, defaults to all lncRNA units.}
 
-\item{Go}{The Boolean value determines whether to visualize the functional enrichment results of several units. The default value is FALSE.}
+\item{DEAUC}{Boolean values determine whether to compare differential activity of units between two groups. The default value is TRUE.}
 
-\item{MetascapeGofile}{Metascape results.}
+\item{item.add}{A new list of cell information, including new cell item column.}
+
+\item{DEitem}{ttribute for comparison.}
 }
 \value{
 Return a scLNC object with AUC slot.
@@ -32,7 +35,7 @@ Calculate lncRNA units activity score.
 \examples{
 \dontrun{
 data(LNCobject)
-LNCobject=scLNC_3_Unit (objectInput=LNCobject,AUC=TRUE,displayLncRNA=NULL)
+LNCobject=scLNC_3_Unit (objectInput=LNCobject,AUC=TRUE,displayLncRNA=NULL,DEAUC=TRUE,item.add=NULL,DEitem='majorCluster')
 }
 
 }

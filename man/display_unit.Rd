@@ -4,18 +4,10 @@
 \alias{display_unit}
 \title{The sames and differences of mRNAs coexpressed with lncRNA in an unit between two groups.}
 \usage{
-display_unit(
-  object1,
-  object2,
-  myunit = "LINC010273",
-  corcut1 = 0.7,
-  corcut2 = 0.5
-)
+display_unit(object.list, myunit = "LINC010273", corcut1 = 0.7, corcut2 = 0.5)
 }
 \arguments{
-\item{object1}{A scLNC object of group1.}
-
-\item{object2}{A scLNC object of group2.}
+\item{object.list}{A list of objects including two scLNC objects that need to be compared.}
 
 \item{myunit}{Interesting lncRNA unit name.}
 
@@ -32,7 +24,7 @@ The network diagram of units between the two groups included the same lncRNA and
 \examples{
 \dontrun{
 data(LNCobject2)
-display_unit(object1=LNCobject2,object2=LNCobject2,
+display_unit(object.list=list(LNCobject2,LNCobject2),
 myunit='LINC00861',corcut1=0.7,corcut2=0.5)
 }
 

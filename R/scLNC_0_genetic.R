@@ -1336,8 +1336,10 @@ DeActivity=function(object,item,FC=0.1,pvalue=0.05,min.pct=0.3,padj=1,...){
 #' @importFrom grDevices dev.off pdf
 #' @importFrom graphics legend par symbols
 #' @importFrom  igraph graph_from_data_frame V E layout_nicely
+#'
 #' @param GO_file Metascape results.
 #' @param genelist Two mRNA lists from two units.
+#' @param lncRNA Interesting lncRNA name.
 #'
 #' @return A network diagram, including differences and same in biological functions and mRNAs.
 #' @export
@@ -1349,27 +1351,31 @@ DeActivity=function(object,item,FC=0.1,pvalue=0.05,min.pct=0.3,padj=1,...){
 #' lnc_network(GO_file=Go2Group_LINC00861,genelist=Gene2Group_LINC00861)
 #' }
 #'
-lnc_network<-function(GO_file,genelist){
-  #data(KE_cyto)
-  #data(KE_TF)
+lnc_network<-function(GO_file,genelist,lncRNA){
+  group1<-colnames(genelist)[1]
+  group2<-colnames(genelist)[2]
+  colnames(GO_file)[which(str_detect(colnames(GO_file),paste0("MEMBER_",group1)))]<-"MEMBER_group1"
+  colnames(GO_file)[which(str_detect(colnames(GO_file),paste0("MEMBER_",group2)))]<-"MEMBER_group2"
+  colnames(GO_file)[which(str_detect(colnames(GO_file),paste0("LogP_",group1)))]<-"LogP_group1"
+  colnames(GO_file)[which(str_detect(colnames(GO_file),paste0("LogP_",group2)))]<-"LogP_group2"
   gores = subset(GO_file,Category == "GO Biological Processes")
   gores=subset(gores,gores$Log.q.value.>'-1')
   gores$GO = paste0(gores$GO, ": [", gores$Description, "]")
-  goress<-subset(gores,X_MEMBER_N_LINC00861==1&X_MEMBER_T_LINC00861==0)
-  goress<-goress[order(goress$X_LogP_N_LINC00861),]
-  N_top5<-goress[c(1:5),]
-  goresss<-subset(gores,X_MEMBER_N_LINC00861==0&X_MEMBER_T_LINC00861==1)
-  goresss<-goresss[order(goresss$X_LogP_T_LINC00861),]
-  T_top5<-goresss[c(1:5),]
-  Go<-subset(gores,X_MEMBER_N_LINC00861==1&X_MEMBER_T_LINC00861==1)
-  gore<-rbind(N_top5,T_top5,Go)
+  goress<-subset(gores,MEMBER_group1==1&MEMBER_group2==0)
+  goress<-goress[order(goress$LogP_group1),]
+  group1_top5<-goress[c(1:5),]
+  goresss<-subset(gores,MEMBER_group1==0&MEMBER_group2==1)
+  goresss<-goresss[order(goresss$LogP_group2),]
+  group2_top5<-goresss[c(1:5),]
+  Go<-subset(gores,MEMBER_group1==1&MEMBER_group2==1)
+  gore<-rbind(group1_top5,group2_top5,Go)
   gore<-gore[apply(gore, 1, function(x) !all(is.na(x))),]
-  mRNA= do.call('rbind', apply(gore[c('Hits', 'GO','X_MEMBER_N_LINC00861','X_MEMBER_T_LINC00861')], 1, function(m){
+  mRNA= do.call('rbind', apply(gore[c('Hits', 'GO','MEMBER_group1','MEMBER_group2')], 1, function(m){
     data.frame(
       mRNA = unlist(strsplit(m[['Hits']], '\\|')),
       GO = m[['GO']],
-      N_LINC = m[['X_MEMBER_N_LINC00861']],
-      T_LINC = m[['X_MEMBER_T_LINC00861']]
+      group1 = m[['MEMBER_group1']],
+      group2 = m[['MEMBER_group2']]
     )
   }))
 
@@ -1377,39 +1383,39 @@ lnc_network<-function(GO_file,genelist){
 
   for (i in 1:nrow(new_group)){
     sub<-subset(mRNA,GO==new_group$GO[i])
-    if (all(sub$N_LINC=='0')){
-      new_group$new_group[i]<-'T'
-    } else if (all(sub$T_LINC=='0')) {
-      new_group$new_group[i]<-'N'
+    if (all(sub$group1=='0')){
+      new_group$new_group[i]<-group1
+    } else if (all(sub$group2=='0')) {
+      new_group$new_group[i]<-group2
     } else {
-      new_group$new_group[i]<-'T&N'
+      new_group$new_group[i]<-paste(group1,group2)
     }
   }
   mRNA<-merge(mRNA,new_group,by='GO',all.x=T,sort=F)
 
-
-  data1<-genelist
-  cc<-rbind(data1$N_LINC00861,data1$T_LINC00861)
+  ####分割线
   data2<-data.frame(mRNA=unique(mRNA$mRNA),group=NA)
-  data2$group[data2$mRNA %in% data1$N_LINC00861]<-'N'
-  data2$group[data2$mRNA %in% data1$T_LINC00861]<-'T'
-  data2$group[data2$mRNA %in% intersect(data1$N_LINC00861,data1$T_LINC00861)]<-'T&N'
-  data2$N_LINC<-1
-  data2$T_LINC<-1
-  data2$N_LINC[which(str_detect(data2$group, "T"))] <- "0"
-  data2$T_LINC[which(str_detect(data2$group, "N"))] <- "0"
-  data2$T_LINC[which(str_detect(data2$group, "T&N"))] <- "1"
-  data2$N_LINC[which(str_detect(data2$group, "T&N"))] <- "1"
+  data2$group[data2$mRNA %in% genelist[[1]]]<-group1
+  data2$group[data2$mRNA %in% genelist[[2]]]<-group2
+  data2$group[data2$mRNA %in% intersect(genelist[[1]],genelist[[2]])]<-paste(group1,group2)
+  data2$group1<-1
+  data2$group2<-1
+  data2$group1[which(str_detect(data2$group, group2))] <- "0"
+  data2$group2[which(str_detect(data2$group, group1))] <- "0"
+  data2$group1[which(str_detect(data2$group, paste(group1,group2)))] <- "1"
+  data2$group2[which(str_detect(data2$group, paste(group1,group2)))] <- "1"
 
-
+  ##node and edge
   node1<-distinct(data.frame(name=mRNA$GO,lc=mRNA$new_group,size=10,label=str_extract(mRNA$GO,"\\[.+?\\]")))
-  node1$lc[which(node1$lc=='T')]<-'#EA746A'
-  node1$lc[which(node1$lc=='N')]<-'#1DB4B8'
-  node1$lc[which(node1$lc=='T&N')]<-'black'
+
+  node1$lc[which(node1$lc==group2)]<-'#EA746A'
+  node1$lc[which(node1$lc==group1)]<-'#1DB4B8'
+  node1$lc[which(node1$lc==paste(group1,group2))]<-'black'
+
   node2<-data.frame(name=data2$mRNA,lc=data2$group,size=2)
-  node2$lc[which(node2$lc=='T')]<-'#EA746A'
-  node2$lc[which(node2$lc=='N')]<-'#1DB4B8'
-  node2$lc[which(node2$lc=='T&N')]<-'black'
+  node2$lc[which(node2$lc==group2)]<-'#EA746A'
+  node2$lc[which(node2$lc==group1)]<-'#1DB4B8'
+  node2$lc[which(node2$lc==paste(group1,group2))]<-'black'
   node2$label<-''
   node2$label[node2$name %in% KE_cyto$gene]<-'cyto'
   node2$label[node2$name %in% KE_TF$gene]<-'TF'
@@ -1421,10 +1427,16 @@ lnc_network<-function(GO_file,genelist){
       node2$label[i]=node2$name[i]
     }
   }
+
   node<-rbind(node1,node2)
+
   node$dist<-1
   node$dist[which(str_detect(node$size, "2"))] <- 0.3
+
+
   edge<-data.frame(from=mRNA$mRNA,to=mRNA$GO,color='gray30')
+
+
   network <- graph_from_data_frame(
     vertices = node,
     d = edge,
@@ -1432,15 +1444,18 @@ lnc_network<-function(GO_file,genelist){
   )
 
 
-
+  ###correct_pie_values
   mrna_go<-mRNA[,c(1,3,4)]
   mrna_go<-unique(mrna_go)
   mrna_go1<-t(mrna_go)
   mrna_go1<-as.data.frame(mrna_go1)
   colnames(mrna_go1)=mrna_go1[1,]
   mrna_go1<-mrna_go1[-1,]
+
   mrna_go2=as.data.frame(lapply(mrna_go1,as.numeric))
+
   go_values<-as.list(mrna_go2)
+
   mrna_group <-data2[,-2]
   mrna_group1<-t(mrna_group)
   mrna_group1<-as.data.frame(mrna_group1)
@@ -1449,29 +1464,24 @@ lnc_network<-function(GO_file,genelist){
   mrna_group2=as.data.frame(lapply(mrna_group1,as.numeric))
   mrna_values<-as.list(mrna_group2)
   values<-c(go_values,mrna_values)
+
   V(network)$size<-node$size
   V(network)$pie.color=list(c("#1DB4B8", "#EA746A"))
   V(network)$label<-node$label
   V(network)$label.color<-node$lc
   E(network)$color<-edge$color
+  ###try pie vertex
 
-
-  pdf('mRNA_final_top5_logq.pdf',width=20,height=20)
-  set.seed(1234)
-  par(oma=c(1,1,1,1),mar=c(4,4,4,5))
-  if (interactive()) {
-    plot(network,vertex.shape="pie",vertex.frame.color = NA,vertex.pie=values,vertex.label.dist=node$dist, vertex.label.degree=-pi/2, ,label.cex=0.5,
-         layout =layout_nicely,
-         edge.arrow.size=0.3,
-         edge.curved=0.3)
-  }
-  legend("bottomright", legend = c("T","N"), col = c('#EA746A','#1DB4B8'),bty = "n", pch=19 , pt.cex = 1,
-         cex = 1, text.col="black" , horiz = FALSE,
-         inset = c(0.1, 0.1))
-  dev.off()
+  pdf(paste0(lncRNA,'_DEGO.pdf'),width=20,height=20)
+      plot(network,vertex.shape="pie",vertex.frame.color = NA,vertex.pie=values,vertex.label.dist=node$dist, vertex.label.degree=-pi/2, ,label.cex=0.5,
+           layout =layout_nicely,
+           edge.arrow.size=0.3,
+           edge.curved=0.3)
+      legend("bottomright", legend = c(group2,group1), col = c('#EA746A','#1DB4B8'),bty = "n", pch=19 , pt.cex = 1,
+             cex = 1, text.col="black" , horiz = FALSE,
+             inset = c(0.1, 0.1))
+      dev.off()
 }
-
-
 
 
 
