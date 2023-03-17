@@ -1090,11 +1090,11 @@ CompareGo=function(gores,cutoff_p = 0.05,cutoff_top = 10){
 #' @description The network diagram of units between the two groups included the same lncRNA and differences mRNAs co-expressed with them.
 #' @importFrom  igraph graph_from_data_frame add_shape V E
 #'
-#' @param object1 A scLNC object of group1.
-#' @param object2 A scLNC object of group2.
+#' @param object.list A list of objects including two scLNC objects that need to be compared.
 #' @param myunit Interesting lncRNA unit name.
 #' @param corcut1 Top pairs with high correlation coefficient in group1.
 #' @param corcut2 Top pairs with high correlation coefficient in group2.
+#'
 #'
 #' @return Return a network diagram.
 #' @export
@@ -1102,11 +1102,13 @@ CompareGo=function(gores,cutoff_p = 0.05,cutoff_top = 10){
 #' @examples
 #' \dontrun{
 #' data(LNCobject2)
-#' display_unit(object1=LNCobject2,object2=LNCobject2,
+#' display_unit(object.list=list(LNCobject2,LNCobject2),
 #' myunit='LINC00861',corcut1=0.7,corcut2=0.5)
 #'}
 #'
-display_unit=function(object1,object2,myunit='LINC010273',corcut1=0.7,corcut2=0.5){
+display_unit=function(object.list,myunit='LINC010273',corcut1=0.7,corcut2=0.5){
+  object1=object.list[[1]]
+  object2=object.list[[2]]
   object1@ link.data$pairs=subset(object1@ link.data$pairs,cor>corcut1)
   object2@ link.data$pairs=subset(object2@ link.data$pairs,cor>corcut2)
   N_unit1_BMS1P4=object1@ link.data$pairs[object1@ link.data$pairs$rowname==myunit,][,c('rowname','columnname','withEnhancer','withPromotor','withSeq','ndG','withcyto','withTF','withPairs','score')]
@@ -1265,7 +1267,7 @@ display_unit=function(object1,object2,myunit='LINC010273',corcut1=0.7,corcut2=0.
     shapes[grep(paste(unique(temp_inter$columnname[which(temp_inter$'withTF'=='true')]),collapse = '|'),V(mygraph)$name)]="triangle"
   }
 
-
+pdf(paste0('display_unit_',myunit,'.pdf'))
   plot(mygraph,vertex.size=15*de,vertex.shape=shapes,
        vertex.label.cex=.6,vertex.label.dist=0,
        edge.curved=0,vertex.label.color='black',vertex.frame.color='grey')
@@ -1278,6 +1280,7 @@ display_unit=function(object1,object2,myunit='LINC010273',corcut1=0.7,corcut2=0.
   legend( x=1,y=-1.2, c('TF','cytokine'), pch=c(2,0),
           col="grey", pt.bg=c(alpha('#C65146',0.5), alpha('#4F86C6',0.5),alpha('#A593E0',0.5)), bty="n",
           pt.cex=2, cex=.8,  ncol=1,title="Target annotation")
+  dev.off()
 }
 
 

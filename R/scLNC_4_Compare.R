@@ -1,47 +1,41 @@
 
 #' Compare units from different items.
+#' @import plyr
 #'
-#' @param Activity Boolean values determine whether to compare differential activity of units between two groups. The default value is TRUE.
-#' @param objectInput A scLNC object with AUC slot.
-#' @param DEitem ttribute for comparison.
-#' @param DisplayUnit Boolean values determine whether to compare composition of units between two groups. The default value is TRUE.
-#' @param objectCtrl A scLNC object of group1.
-#' @param objectCondi A scLNC object of group2.
+#' @param DEtarget Boolean values determine whether to compare composition of units between two groups. The default value is TRUE.
+#' @param ob.ls A list of objects including two scLNC objects that need to be compared.
 #' @param lncRNA Interesting lncRNA unit name.
-#' @param corcutCtrl Top pairs with high correlation coefficient in group1.
-#' @param corcutCondi Top pairs with high correlation coefficient in group2.
 #' @param DeGO Boolean values determine whether to compare differences in functional enrichment between the two groups of units. The default value is TRUE.
-#' @param CopareGOfile GO_file Metascape results.
-#' @param CopareGeneList genelist Two mRNA lists from two units.
+#' @param CopareGOfile A GO_file Metascape results of two groups.
+#' @param CopareGeneList A data frame including two mRNA lists from two groups.
 #'
-#'
-#' @return a scLNC object with Differential activity of units slot.
+#' @return Corresponding plot.
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' data(LNCobject)
-#' LNCobject=scLNC_3_Unit (objectInput=LNCobject,AUC=TRUE,displayLncRNA=NULL)
-#' LNCobject=scLNC_4_Compare(Activity=TRUE,objectInput=LNCobject,
-#' DEitem='majorCluster',DisplayUnit=FALSE,DeGO=FALSE)
-#'}
-#'
-scLNC_4_Compare <- function(Activity=TRUE,objectInput,DEitem='majorCluster',
-					DisplayUnit=TRUE,objectCtrl,objectCondi,lncRNA,corcutCtrl,corcutCondi,
-					DeGO=TRUE,CopareGOfile,CopareGeneList){
+scLNC_4_Compare <- function(DEtarget=TRUE,ob.ls,lncRNA,
+                            DeGO=TRUE,CopareGOfile,CopareGeneList){
 
-if(Activity){
-objectInput <- DeActivity(object=objectInput,item=DEitem,FC=0.1,pvalue=0.05,min.pct=0.3,padj=1)
-return(objectInput)
-}
-if(DisplayUnit){
-display_unit(object1=objectCtrl,object2=objectCondi,myunit=lncRNA,corcut1=corcutCtrl,corcut2=corcutCondi)
+
+  if(DEtarget){
+
+    ob.ls=lapply(ob.ls,function(i){
+
+      q1=setdiff(c('withEnhancer','withPromotor','withSeq','ndG','withcyto','withTF','withPairs','score'),colnames(i@ link.data$pairs))
+      df=data.frame(matrix(ncol=length(q1),nrow=nrow(i@ link.data$pairs)))
+      colnames(df)=q1
+      i@ link.data$pairs=cbind(i@ link.data$pairs,df)
+      return(i)
+    })
+
+    display_unit(object.list=ob.ls,myunit=lncRNA)
+  }
+
+  if(DeGO){
+
+    lnc_network(object.list=ob.ls,lncRNA,GO_file=CopareGOfile,genelist=CopareGeneList)
+  }
+
 
 }
-if(DeGO){
-lnc_network(GO_file=CopareGOfile,genelist=CopareGeneList)
-}
-
-}
-
 
