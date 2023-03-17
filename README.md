@@ -6,7 +6,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of scLNC is to investigate lncRNA function in single-cell
+The goal of scLNC is to investigate lncRNA functions in single-cell
 RNA-seq.
 
 ## Installation
