@@ -16,28 +16,33 @@ RNA-seq.
 devtools::install_github("xgaoo/scLNC")
 ```
 
+## Example data
+
+You can download a example data from
+[GEO](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98638).
+
 ## Examples
 
-1.Create a scLNC object for analysis.
+1.  Create a scLNC object for analysis.
 
 ``` r
 LNCobject=scLNC_1_CreateLNCobject (count_table1= HCC_rawcount, cell_info1= HCC_cellinfo)
 ```
 
-2.Perform calculation, filtration and annotation of lncRNA-mRNA
-co-expression relationship pairs.
+2.  Perform calculation, filtration and annotation of lncRNA-mRNA
+    co-expression relationship pairs.
 
 ``` r
-LNCobject=scLNC_2_Relation(objectInput=LNCobject,relation.fileName='test',pairs.filter=TRUE,corcut=0.6,anno.pairs=TRUE)
+LNCobject=scLNC_2_Relation(objectInput=LNCobject,relation.fileName='HCC',pairs.filter=TRUE,corcut=0.6,anno.pairs=TRUE)
 ```
 
-3.Calculate lncRNA units activity score.
+3.  Calculate lncRNA units activity score.
 
 ``` r
 LNCobject=scLNC_3_Unit (objectInput=LNCobject,AUC=TRUE,displayLncRNA=NULL,DEAUC=TRUE,item.add=NULL,DEitem='majorCluster')
 ```
 
-4.Compare units from different items.
+4.  Compare units from different items.
 
 ``` r
 scLNC_4_Compare(DisplayUnit=TRUE,ob.ls,lncRNA,DeGO=TRUE,CopareGOfile,CopareGeneList)
