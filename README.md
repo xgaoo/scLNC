@@ -6,7 +6,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of scLNC is to investigate lncRNA function in single-cell
+The goal of scLNC is to investigate lncRNA functions in single-cell
 RNA-seq.
 
 ## Installation
@@ -47,7 +47,7 @@ LNCobject=scLNC_2_Relation(objectInput=LNCobject,relation.fileName='HCC',pairs.f
 LNCobject=scLNC_3_Unit (objectInput=LNCobject,AUC=TRUE,displayLncRNA=NULL,DEAUC=TRUE,item.add=NULL,DEitem='majorCluster')
 ```
 
-4.  Compare units from different experimental conditions.
+4.  Compare lncRNA units from different experimental conditions.
 
 ``` r
 scLNC_4_Compare(DisplayUnit=TRUE,ob.ls,lncRNA,DeGO=TRUE,CopareGOfile,CopareGeneList)
