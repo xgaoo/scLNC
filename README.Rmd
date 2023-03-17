@@ -31,7 +31,12 @@ devtools::install_github("xgaoo/scLNC")
 
 ## Example data
 
-You can download a example data from [GEO](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98638).
+You can download a example data from [GEO](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98638) with the commands in linux:
+
+``` r
+wget https://ftp.ncbi.nlm.nih.gov/geo/series/GSE98nnn/GSE98638/suppl/GSE98638_HCC.TCell.S5063.count.txt.gz
+wget https://ftp.ncbi.nlm.nih.gov/geo/series/GSE98nnn/GSE98638/miniml/GSE98638_family.xml.tgz
+```
 
 
 
