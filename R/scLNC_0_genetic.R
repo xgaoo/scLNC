@@ -691,7 +691,7 @@ load_tdf_enhancer = function(PATH='~/test/packages/_tdf_enhancer_nydgab/enhancer
     res,
     enhOut_tmp[c('GeneID', 'region')] %>% rename(c('targetGene'='GeneID')),
     by=c('region')
-  ) %>% dplyr::select(-c('V2', 'V4'))
+  ) %>% select(-c('V2', 'V4'))
   return(res)
 }
 
@@ -721,9 +721,9 @@ load_tdf_promoter = function(PATH='~/test/packages/_tdf_promoter_nydgab/promoter
   res = left_join(
     res,
     read.table('~/rgtdata/hg38/alias_human.txt', sep='\t', quote = NULL) %>%
-   dplyr::select(c('V1', 'V2')) %>% rename(c('targetGene'='V1', 'Symbol'='V2')),
+   select(c('V1', 'V2')) %>% rename(c('targetGene'='V1', 'Symbol'='V2')),
     by=c('V4'='Symbol')
-  ) %>% dplyr::select(-c('V2', 'V4'))
+  ) %>% select(-c('V2', 'V4'))
   return(res)
 }
 
@@ -772,7 +772,7 @@ getShortPath = function(lncID, endpoints, corrlist){
     df_res,
     unique(rbind(
       corrlist[, c("row", "column", "cor")],
-      corrlist[, c("column", "row", "cor")] %>% dplyr::rename(c('column'='row', 'row'='column'))
+      corrlist[, c("column", "row", "cor")] %>% rename(c('column'='row', 'row'='column'))
     )),
     by=c('from'='row', 'to'='column')
   )
@@ -1332,10 +1332,11 @@ DeActivity=function(object,item,FC=0.1,pvalue=0.05,min.pct=0.3,padj=1,...){
 
 
 #' Differences in functional enrichment between the two groups of units.
-#' @import stringr
+#' @importFrom stringr str_detect str_extract
+#' @importFrom dplyr distinct
 #' @importFrom grDevices dev.off pdf
 #' @importFrom graphics legend par symbols
-#' @importFrom  igraph graph_from_data_frame V E layout_nicely
+#' @importFrom igraph graph_from_data_frame V E layout_nicely
 #'
 #' @param GO_file Metascape results.
 #' @param genelist Two mRNA lists from two units.
@@ -1348,7 +1349,7 @@ DeActivity=function(object,item,FC=0.1,pvalue=0.05,min.pct=0.3,padj=1,...){
 #' \dontrun{
 #' data(Go2Group_LINC00861)
 #' data(Gene2Group_LINC00861)
-#' lnc_network(GO_file=Go2Group_LINC00861,genelist=Gene2Group_LINC00861)
+#' lnc_network(GO_file=Go2Group_LINC00861,genelist=Gene2Group_LINC00861,lncRNA='LINC00861')
 #' }
 #'
 lnc_network<-function(GO_file,genelist,lncRNA){

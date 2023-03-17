@@ -1,9 +1,8 @@
 Package: scLNC
-Title: What the Package Does (One Line, Title Case)
+Title: scLNC: A tool for lncRNA functional analysis in single-cell RNA-seq
 Version: 0.0.0.9100
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+    Qianqian Meng, Yang Lei, Mengyu Zhao, Fang Hong, Xin Gao.
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 Encoding: UTF-8

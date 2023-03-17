@@ -23,7 +23,7 @@ Differences in functional enrichment between the two groups of units.
 \dontrun{
 data(Go2Group_LINC00861)
 data(Gene2Group_LINC00861)
-lnc_network(GO_file=Go2Group_LINC00861,genelist=Gene2Group_LINC00861)
+lnc_network(GO_file=Go2Group_LINC00861,genelist=Gene2Group_LINC00861,lncRNA='LINC00861')
 }
 
 }

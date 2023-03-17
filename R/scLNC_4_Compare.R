@@ -1,6 +1,5 @@
 
 #' Compare units from different items.
-#' @import plyr
 #'
 #' @param DEtarget Boolean values determine whether to compare composition of units between two groups. The default value is TRUE.
 #' @param ob.ls A list of objects including two scLNC objects that need to be compared.
@@ -12,7 +11,7 @@
 #' @return Corresponding plot.
 #' @export
 #'
-#' @examples
+#'
 scLNC_4_Compare <- function(DEtarget=TRUE,ob.ls,lncRNA,
                             DeGO=TRUE,CopareGOfile,CopareGeneList){
 
