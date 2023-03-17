@@ -1352,7 +1352,7 @@ DeActivity=function(object,item,FC=0.1,pvalue=0.05,min.pct=0.3,padj=1,...){
 #' lnc_network(GO_file=Go2Group_LINC00861,genelist=Gene2Group_LINC00861,lncRNA='LINC00861')
 #' }
 #'
-lnc_network<-function(GO_file,genelist,lncRNA){
+lnc_network<-function(GO_file,genelist,lncRNA='LINC00861'){
   group1<-colnames(genelist)[1]
   group2<-colnames(genelist)[2]
   colnames(GO_file)[which(str_detect(colnames(GO_file),paste0("MEMBER_",group1)))]<-"MEMBER_group1"
@@ -1486,6 +1486,136 @@ lnc_network<-function(GO_file,genelist,lncRNA){
 
 
 
+getTopn = function(auc, iterm, top_n){
+  auc = as.data.frame(auc)
+  iterm_tmp = iterm[names(iterm) %in% colnames(auc)]
+  mtx = auc[, colnames(auc) %in% names(iterm_tmp)]
+  cgrps = split(names(iterm_tmp), iterm_tmp)
+  meanAUC = do.call('rbind', lapply(names(cgrps), function(cid){
+    rowSums(mtx[, cgrps[[cid]]]) / length(cgrps[[cid]])
+  })) %>% as.data.frame %>% add_column('group'=names(cgrps)) %>% column_to_rownames('group')
+  wilcox_pval = do.call('rbind', apply(mtx, 1, function(m){
+    do.call('rbind', lapply(names(cgrps), function(cid){
+      cellids = cgrps[[cid]]
+      res = wilcox.test(
+        m[names(m) %in% cellids],
+        m[!names(m) %in% cellids],
+        alternative = 'greater'
+      )
+      data.frame(
+        group = cid,
+        pvalue = res$p.value
+      )
+    })) %>% pivot_wider(names_from = 'group', values_from = 'pvalue')
+  }))
+  lnc_list = names(head(sort(apply(wilcox_pval, 1, min)), top_n))
+  return(t(meanAUC)[lnc_list, ])
+}
+
+
+get_hcluster = function(mtx, clustN=5, pos='left', col_fun){
+  set.seed(0)
+  d=dist(mtx,method="euclidean")
+  d=as.dist(d)
+  h=hclust(d,method="ward.D")
+  grp = data.frame(
+    lnc =  h$labels[h$order],
+    grp=data.frame(
+      row.names = unique(cutree(h, clustN)[h$order]),
+      weight = 1:length(unique(cutree(h, clustN)[h$order]))
+    )[
+      as.character(cutree(h, clustN)[h$order]), 'weight'
+    ],
+    y = 1-((1:length(h$labels) - 0.5) / length(h$labels))
+  )
+
+  dend=as.dendrogram(h)
+  p = Heatmap(
+    show_column_names = F,
+    bottom_annotation = HeatmapAnnotation(
+      foo1 = anno_text(
+        colnames(mtx_a_rowscaled),
+        height = unit(0.6, "inch"),
+        gp = gpar(fontsize=6)
+      )
+    ),
+    column_names_max_height = unit(20, "inch"),
+    row_split = clustN,
+    row_gap = unit(0, "mm"),column_gap = unit(0, "mm"),
+    cluster_rows = dend,
+    col = col_fun,
+    show_heatmap_legend = F,
+    column_title_gp = gpar(
+      fontsize = 6, lineheight=6
+    ),
+    row_title_gp = gpar(fontsize = 6),
+    row_dend_gp = gpar(fontsize = 6, lwd=0.5),
+    row_dend_width = unit(0.2, "inch"),
+    row_names_gp = gpar(fontsize = 6),
+    column_names_gp = gpar(fontsize = 6),
+    row_dend_reorder = FALSE,
+    cluster_columns = F,
+    row_names_side = ifelse(pos=='left', 'right', 'left'),
+    row_dend_side  = pos,
+    row_title_side = pos,
+    border_gp = gpar(col = "black", lwd=0.2),
+    mtx
+  )
+  return(
+    list(grp=grp, dend=dend, plot=as.ggplot(p))
+  )
+}
+
+
+#' Title The difference in AUC between the two experimental conditions.
+#' @import dplyr
+#' @import ggplot2
+#' @import RColorBrewer
+#' @importFrom circlize colorRamp2
+#'
+#' @param object.list A list of objects including two scLNC objects that need to be compared.
+#' @param cluster_a The number of divisions of clusters in a group.
+#' @param cluster_b The number of divisions of clusters in the other group.
+#' @param limit_a The number of lncRNAs to display in a group.
+#' @param limit_b The number of lncRNAs to display in the other group.
+#' @param label_a The title of a group.
+#' @param label_b The title of the other group.
+#'
+#' @return The AUC heatmaps of two groups and the same lncRNAs in the two groups.
+#' @export
+#'
+#'
+DEAUC_2item <- function(object.list,cluster_a = 5,cluster_b = 5,limit_a = 50,limit_b = 50,label_a = 'group1',label_b = 'group2'){
+  mtx_a = getTopn(object.list[[1]]@unit$AUC, object.list[[1]]@ cell.info[,1], limit_a)
+  mtx_b = getTopn(object.list[[2]]@unit$AUC, object.list[[2]]@ cell.info[,1], limit_b)
+
+  mtx_a_rowscaled = apply(as.data.frame(mtx_a), 1, scale) %>% as.data.frame %>% add_column(group=colnames(mtx_a)) %>% column_to_rownames('group') %>% t
+  mtx_b_rowscaled = apply(as.data.frame(mtx_b), 1, scale) %>% as.data.frame %>% add_column(group=colnames(mtx_b)) %>% column_to_rownames('group') %>% t
+
+  col_fun = colorRamp2(
+    seq(min(rbind(mtx_a_rowscaled, mtx_b_rowscaled)), max(rbind(mtx_a_rowscaled, mtx_b_rowscaled)), length.out = 100),
+    rev(colorRampPalette(brewer.pal(n = 7, name = "RdYlBu"), bias=1)(100))
+  )
+
+  hc_a = get_hcluster(mtx_a_rowscaled, cluster_a, pos='left', col_fun=col_fun)
+  hc_b = get_hcluster(mtx_b_rowscaled, cluster_b, pos='right', col_fun=col_fun)
+  lnks = inner_join(hc_a$grp,hc_b$grp,by=c('lnc'))
+
+  plink = ggplot(lnks) +
+    geom_segment(aes(x=1, xend=2, y=y.x, yend=y.y, color=as.character(grp.x)), size=0.2) +
+    coord_cartesian(expand = F) +
+    theme_void() + xlim(1,2) + ylim(0, 1) +
+    theme(
+      plot.margin = margin(c(0.085,0,0.72,0), unit='inch'),
+      legend.position='none'
+    )
+
+  plot_gg = as.ggplot(as.ggplot(hc_a$plot) + labs(title=label_a)) + as.ggplot(plink + labs(title=' ')) + as.ggplot(as.ggplot(hc_b$plot) + labs(title=label_b)) + plot_layout(widths = c(2,0.3,2)) + theme(panel.spacing = unit(0, 'pt'))
+  pdf('DEAUC.pdf')
+  plot_gg
+  dev.off()
+
+}
 
 
 

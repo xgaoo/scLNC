@@ -2,7 +2,12 @@ Package: scLNC
 Title: scLNC: A tool for lncRNA functional analysis in single-cell RNA-seq
 Version: 0.0.0.9100
 Authors@R: 
-    Qianqian Meng, Yang Lei, Mengyu Zhao, Fang Hong, Xin Gao.
+   c(person(given="Qianqian", family="Meng", email="mengqianqian@ihcams.ac.cn", role = "aut"),
+	 person(given="Yang", family="Lei", email="leiyang@ihcams.ac.cn", role = "ctb"),
+	 person(given="Mengyu", family="Zhao", email="zhaomengyu9807@126.com", role = "ctb"),
+	 person(given="Fang", family="Hong", email="hongfang@ihcams.ac.cn", role = "ctb"),
+	 person(given="Xin", family="Gao", email="gaoxin1@ihcams.ac.cn", role = c("aut", "cre"))
+		)
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -22,7 +27,8 @@ Imports: AUCell,
         reticulate,
         Seurat,
         utils,
-        biomaRt
+        biomaRt,
+        circlize
 Depends: 
     R (>= 2.10)
 LazyData: true

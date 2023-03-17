@@ -4,7 +4,7 @@
 \alias{lnc_network}
 \title{Differences in functional enrichment between the two groups of units.}
 \usage{
-lnc_network(GO_file, genelist, lncRNA)
+lnc_network(GO_file, genelist, lncRNA = "LINC00861")
 }
 \arguments{
 \item{GO_file}{Metascape results.}

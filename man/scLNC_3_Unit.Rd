@@ -35,7 +35,8 @@ Calculate lncRNA units activity score.
 \examples{
 \dontrun{
 data(LNCobject)
-LNCobject=scLNC_3_Unit (objectInput=LNCobject,AUC=TRUE,displayLncRNA=NULL,DEAUC=TRUE,item.add=NULL,DEitem='majorCluster')
+LNCobject=scLNC_3_Unit (objectInput=LNCobject,AUC=TRUE,displayLncRNA=NULL,
+DEAUC=TRUE,item.add=NULL,DEitem='majorCluster')
 }
 
 }

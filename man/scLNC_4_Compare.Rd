@@ -10,7 +10,8 @@ scLNC_4_Compare(
   lncRNA,
   DeGO = TRUE,
   CopareGOfile,
-  CopareGeneList
+  CopareGeneList,
+  DEAUC = TRUE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ scLNC_4_Compare(
 \item{CopareGOfile}{A GO_file Metascape results of two groups.}
 
 \item{CopareGeneList}{A data frame including two mRNA lists from two groups.}
+
+\item{DEAUC}{Boolean value determining whether to compare the difference in AUC of two sets of units. The default value is true.}
 }
 \value{
 Corresponding plot.

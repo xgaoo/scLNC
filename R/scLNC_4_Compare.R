@@ -7,13 +7,14 @@
 #' @param DeGO Boolean values determine whether to compare differences in functional enrichment between the two groups of units. The default value is TRUE.
 #' @param CopareGOfile A GO_file Metascape results of two groups.
 #' @param CopareGeneList A data frame including two mRNA lists from two groups.
+#' @param DEAUC Boolean value determining whether to compare the difference in AUC of two sets of units. The default value is true.
 #'
 #' @return Corresponding plot.
 #' @export
 #'
 #'
 scLNC_4_Compare <- function(DEtarget=TRUE,ob.ls,lncRNA,
-                            DeGO=TRUE,CopareGOfile,CopareGeneList){
+                            DeGO=TRUE,CopareGOfile,CopareGeneList,DEAUC=TRUE){
 
 
   if(DEtarget){
@@ -32,9 +33,12 @@ scLNC_4_Compare <- function(DEtarget=TRUE,ob.ls,lncRNA,
 
   if(DeGO){
 
-    lnc_network(object.list=ob.ls,lncRNA,GO_file=CopareGOfile,genelist=CopareGeneList,lncRNA)
+    lnc_network(lncRNA,GO_file=CopareGOfile,genelist=CopareGeneList)
   }
 
+ if(DEAUC){
+   DEAUC_2item(object.list=ob.ls)
 
+ }
 }
 

@@ -15,7 +15,8 @@
 #' @examples
 #' \dontrun{
 #'data(LNCobject)
-#'LNCobject=scLNC_3_Unit (objectInput=LNCobject,AUC=TRUE,displayLncRNA=NULL,DEAUC=TRUE,item.add=NULL,DEitem='majorCluster')
+#'LNCobject=scLNC_3_Unit (objectInput=LNCobject,AUC=TRUE,displayLncRNA=NULL,
+#'DEAUC=TRUE,item.add=NULL,DEitem='majorCluster')
 #'}
 #'
 scLNC_3_Unit <- function(objectInput,AUC=TRUE,displayLncRNA=NULL,DEAUC=TRUE,item.add=NULL,DEitem='majorCluster'){
