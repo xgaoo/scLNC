@@ -1567,7 +1567,7 @@ get_hcluster = function(mtx, clustN=5, pos='left', col_fun){
 }
 
 
-#' Title The difference in AUC between the two experimental conditions.
+#' The difference in AUC between the two experimental conditions.
 #' @import dplyr
 #' @import ggplot2
 #' @import RColorBrewer

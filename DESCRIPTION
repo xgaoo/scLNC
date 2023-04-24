@@ -28,7 +28,15 @@ Imports: AUCell,
         Seurat,
         utils,
         biomaRt,
-        circlize
+        circlize,
+        ComplexHeatmap,
+        patchwork,
+        reshape2,
+        edgeR,
+        scales
 Depends: 
     R (>= 2.10)
 LazyData: true
+
+
+

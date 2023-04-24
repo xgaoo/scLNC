@@ -2,7 +2,7 @@
 % Please edit documentation in R/scLNC_0_genetic.R
 \name{DEAUC_2item}
 \alias{DEAUC_2item}
-\title{Title The difference in AUC between the two experimental conditions.}
+\title{The difference in AUC between the two experimental conditions.}
 \usage{
 DEAUC_2item(
   object.list,
@@ -33,5 +33,5 @@ DEAUC_2item(
 The AUC heatmaps of two groups and the same lncRNAs in the two groups.
 }
 \description{
-Title The difference in AUC between the two experimental conditions.
+The difference in AUC between the two experimental conditions.
 }
