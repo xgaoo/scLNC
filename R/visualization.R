@@ -600,4 +600,65 @@ StatGeneNum=function(object,genetype='lncRNA',item='Tissue',item.level=c('T','N'
  }
 
 
+#' Statistics on the percentage of Enhancer, Promoter and sequence-based.
+#'
+#' @param CoexpPairs
+#'
+#' @return A barplot.
+#' @export
+#'
+#'
+ sta_target33=function (CoexpPairs)
+ {
+   colVars_te = list(PairClass = c(no = "#f1f3f3", EPS = "#66C2A5",
+                                   EP = "#C8B5CC", ES = "#8EC553", PS = "#E78AC3", E = "#9CC0E6",
+                                   P = "#5A77BA", S = "#F5C55F"))
+   a1 = CoexpPairs[, c("rowname", "withEnhancer", "withPromotor", "withSeq")]
+   #  a1$withPromotor = "false"
+   a1$class = ""
+   a1[which(a1$withEnhancer == "true" & a1$withPromotor == "true" &
+              a1$withSeq == "true"), "class"] = "EPS"
+   a1[which(a1$withEnhancer == "true" & a1$withPromotor == "false" &
+              a1$withSeq == "false"), "class"] = "E"
+   a1[which(a1$withEnhancer == "false" & a1$withPromotor ==
+              "true" & a1$withSeq == "false"), "class"] = "P"
+   a1[which(a1$withEnhancer == "false" & a1$withPromotor ==
+              "false" & a1$withSeq == "true"), "class"] = "S"
+   a1[which(a1$withEnhancer == "true" & a1$withPromotor == "true" &
+              a1$withSeq == "false"), "class"] = "EP"
+   a1[which(a1$withEnhancer == "true" & a1$withPromotor == "false" &
+              a1$withSeq == "true"), "class"] = "ES"
+   a1[which(a1$withEnhancer == "false" & a1$withPromotor ==
+              "true" & a1$withSeq == "true"), "class"] = "PS"
+   a1[which(a1$withEnhancer == "false" & a1$withPromotor ==
+              "false" & a1$withSeq == "false"), "class"] = "no"
+   a1$class = factor(a1$class, levels = setdiff(c("no", "EPS",
+                                                  "EP", "ES", "PS", "E", "P", "S"), setdiff(c("no", "EPS",
+                                                                                              "EP", "ES", "PS", "E", "P", "S"), unique(a1$class))))
+   a1$rowname=factor(a1$rowname,levels=geneOrder)
+   a1.ls = split(a1, a1$rowname)
+   sta_a1.ls = lapply(a1.ls, function(x) {
+     table(x$class)
+   })
+   sta_a1 = do.call(rbind, sta_a1.ls)
+   sta_a2 = round(sta_a1/rowSums(sta_a1) * 100, 2)
+   te = as.data.frame(table(CoexpPairs$rowname))
+   te = te[order(te$Freq, decreasing = TRUE), ]
+   te_class = reshape2::melt(sta_a1)
+   te_class2 = reshape2::melt(sta_a2)
+   te_class = cbind(te_class, te_class2$value)
+   #te_class = subset(te_class, value != 0)
+   # te_class$Var1 = factor(te_class$Var1, levels = te$Var1)
+   colnames(te_class)[4] = "percent"
+   colVars_te$PairClass = colVars_te$PairClass[levels(a1$class)]
+   g1 = ggplot(data = te_class, aes(x = Var1, y = percent, fill = Var2)) +
+     geom_bar(aes(x = Var1, y = percent, fill = Var2), position = "stack",
+              stat = "identity") + theme_bw() +theme(panel.grid =element_blank(),plot.title = element_text(hjust = 0.5,
+                                                                                                           size = 15), axis.title = element_text(size = 15), axis.text = element_text(size = 13),
+                                                     axis.text.x = element_text(angle = 90, hjust = 1), legend.title = element_text(size = 15),
+                                                     legend.text = element_text(size = 12)) + labs(x = "",
+                                                                                                   y = "targets") + scale_fill_manual(values = colVars_te$PairClass,
+                                                                                                                                      name = "class")
+   return(g1)
+ }
 
