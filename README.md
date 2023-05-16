@@ -103,29 +103,24 @@ Dispersion (CV2) against mean expression.
 </div>
 
 Identify the enrichment of cell types under different experimental
-conditions (like Tissues).
+conditions (like Tissues). According to the enrichment of cell types in
+different tissues, the number of lncRNAs in different cell types in each
+tissue was compared.
 
 ``` r
 celltype_enrich(object=LNCobject)
+StatGeneNum(object=LNCobject,genetype='lncRNA',item='Tissue',item.level=c('T','N','P'),split.by='majorCluster', 
+disorder=c('C04_CD8-LAYN','C08_CD4-CTLA4','C10_CD4-CXCL13','C05_CD8-GZMK','C11_CD4-GNLY',"C09_CD4-GZMA",'C07_CD4-FOXP3','C03_CD8-SLC4A10','C01_CD8-LEF1','C06_CD4-CCR7','C02_CD8-CX3CR1'))
 ```
 
 <div class="figure" style="text-align: center">
 
-<img src="examplefigure/ROE_celltype.png" alt="The odds ratio (OR) of cell types in different tissues." width="50%" />
+<img src="examplefigure/ROE_celltype.png" alt="The odds ratio (OR) of cell types in different tissues." width="40%" />
 <p class="caption">
 The odds ratio (OR) of cell types in different tissues.
 </p>
 
 </div>
-
-According to the enrichment of cell types in different tissues in the
-figure above, the number of lncRNAs in different cell types in each
-tissue was compared.
-
-``` r
-StatGeneNum(object=LNCobject,genetype='lncRNA',item='Tissue',item.level=c('T','N','P'),split.by='majorCluster', 
-disorder=c('C04_CD8-LAYN','C08_CD4-CTLA4','C10_CD4-CXCL13','C05_CD8-GZMK','C11_CD4-GNLY',"C09_CD4-GZMA",'C07_CD4-FOXP3','C03_CD8-SLC4A10','C01_CD8-LEF1','C06_CD4-CCR7','C02_CD8-CX3CR1'))
-```
 
 <div class="figure" style="text-align: center">
 
@@ -256,8 +251,49 @@ interaction support, triple helix interactions with DNA, known database
 study information), and TF and cytokine annotation of genes.
 
 ``` r
-LNCobject_T=PairsAnnotation(object=LNCobject_T,TF=TRUE,cytokine=TRUE,LMpairs=TRUE)
+LNCobject_T=PairsAnnotation(object=LNCobject_T,Seq=TRUE,Enhancer=TRUE, Promoter=TRUE,TF=TRUE,cytokine=TRUE,LMpairs=TRUE)
 ```
+
+Statistics on the percentage of Enhancer, Promoter and sequence-based
+identification of lncRNAs-mRNAs in tumor and normal tissue.
+
+``` r
+sta_target33(LNCobject_T@ link.data$ pairs)+ labs( title = "T")
+sta_target33(LNCobject_N@ link.data$ pairs)+ labs( title = "N")
+```
+
+<div class="figure" style="text-align: center">
+
+<img src="examplefigure/anno_EPS.png" alt="Direct and indirect correlation." width="100%" />
+<p class="caption">
+Direct and indirect correlation.
+</p>
+
+</div>
+
+Within a lncRNA unit, the correlation between lncRNA and its paired mRNA
+can be direct or indirect. To further examine the relationship of the
+pairs, we applied shortest path algorithm of graph to identify whether
+the correlation of lncRNA and mRNA was direct or mediated by other
+mRNAs。
+
+``` r
+corrlist=CoexpPairs
+ID = 'ENSG00000268066'
+end = unique((corrlist %>% dplyr::filter(simple_type.x == 'lncRNA',simple_type.y == 'mRNA', row == lncID))$column)
+corrlist_shortPath = getShortPath(lncID=ID, endpoints=end,corrlist=CoexpPairs)
+draw_shortPath(corrlist_shortPath)
+stats_indirect_pairs(corrlist)
+```
+
+<div class="figure" style="text-align: center">
+
+<img src="examplefigure/direct.png" alt="Direct and indirect correlation." width="70%" />
+<p class="caption">
+Direct and indirect correlation.
+</p>
+
+</div>
 
 ### 3. Calculate the activity score of lncRNA units.
 
