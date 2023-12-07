@@ -3,6 +3,9 @@
 
 # scLNC: A tool for lncRNA functional analysis in single-cell RNA-seq
 
+Our manuscript published at Cancer Letters can be found
+[here](https://www.sciencedirect.com/science/article/pii/S0304383523002707?via%3Dihub).
+
 ## Preparatory work
 
 ### Installation
@@ -32,44 +35,47 @@ You can get a gene expression matrix and cellular metadata.
 
 ### 1.Create a scLNC object.
 
-For this tutorial, we will be analyzing the a dataset of T cells from
-hepatocellular carcinoma (HCC) patients profiled by Smart-seq2. There
-are 4,070 T cells of peripheral blood (Blood), tumor tissues (Tumor) and
-adjacent normal liver tissues (Normal) from 5 patients.
+For this tutorial, we will analyze a dataset of T cells from
+hepatocellular carcinoma (HCC) patients, which was profiled by
+Smart-seq2. The dataset consists of 4,070 T cells derived from
+peripheral blood (Blood), tumor tissues (Tumor), and adjacent normal
+liver tissues (Normal) from 5 patients.
 
-We next use the count matrix and cell annotation information to create a
-scLNC object. The object serves as a container that contains both data
-(like the count matrix and cell annotation information) and analysis
-result (like co-expressional pairs and unit activity) for a single-cell
-dataset. In the course of the next study, we recommend that users
-understand the scLNC object structure.
-
-``` r
-LNCobject <- createLRAT(count_table=HCC_rawcount, cell_info=HCC_cellinfo, min.cells = 15, min.genes = 200)
-```
-
-In addition, the gene symbols and gene IDs in the matrix can be
-converted into the Ensembl gene ID, which is more convenient for
-subsequent analysis.
+To proceed, we will utilize the count matrix and cell annotation
+information to create a scLNC object. This object acts as a container
+that encompasses both the data (like the count matrix and cell
+annotation information) and the analysis results (like co-expressional
+pairs and unit activity) for a single-cell dataset. Throughout the
+following study, we recommend that users familiarize themselves with the
+structure of the scLNC object.
 
 ``` r
-rownames(HCC_rawcount)=id_convert_fromgtf(genelist=rownames(HCC_rawcount),gtf.info = scLNCgencode)
+LNCobject <- createLRAT(count_table=HCC_rawcount, cell_info=HCC_cellinfo, min.cells=15, min.genes=200)
 ```
 
-Splits object based on a single attribute into a list of subsetted
-objects, one for each level of the attribute. For example, useful for
-taking an object that contains cells from many tissues, and subdividing
-it into tissue-specific objects.
+Additionally, it is possible to convert the gene symbols and gene IDs in
+the matrix to Ensembl gene IDs, which facilitates subsequent analysis.
+
+``` r
+rownames(HCC_rawcount) <- id_convert_fromgtf(genelist=rownames(HCC_rawcount), gtf.info=scLNCgencode)
+```
+
+The ‘splitLRAT’ function divides an object based on a single attribute
+into a list of subsetted objects, where each object represents a
+specific level of the attribute. This functionality is particularly
+useful when dealing with datasets that contain cells from multiple
+tissues, as it allows for the creation of tissue-specific objects by
+subdividing the original object.
 
 ``` r
 LNCobject.list <- splitLRAT(LNCobject, split.item='Tissue')
 ```
 
-According to the annotation of GENCODE database, the gene types were
+Based on the annotation from the GENCODE database, the gene types were
 classified and counted.
 
 ``` r
-classification(object = LNCobject, genetype_range = "all")
+classification(object=LNCobject, genetype_range="all")
 ```
 
 <div class="figure" style="text-align: center">
@@ -89,7 +95,7 @@ indicates points within the confidence interval (middle variability).
 Grey indicates mRNAs. Example genes are labeled.
 
 ``` r
-scCV2(object=LNCobject,limx = c(-2, 2),labelgene=c('PVT1','LINC00963','LINC00265','LINC00299','MIR155HG','TRG-AAS1','MIAT',
+scCV2(object=LNCobject, limx=c(-2, 2), labelgene=c('PVT1','LINC00963','LINC00265','LINC00299','MIR155HG','TRG-AAS1','MIAT',
      'LINC00944','LINC00612','LINC00987','LINC01588','MIR181A1HG','LINC00996','LINC00158','LINC00589','MSD2','LINC00158'))
 ```
 
@@ -109,7 +115,7 @@ tissue was compared.
 
 ``` r
 celltype_enrich(object=LNCobject)
-StatGeneNum(object=LNCobject,genetype='lncRNA',item='Tissue',item.level=c('T','N','P'),split.by='majorCluster', 
+StatGeneNum(object=LNCobject, genetype='lncRNA', item='Tissue', item.level=c('T','N','P'), split.by='majorCluster', 
 disorder=c('C04_CD8-LAYN','C08_CD4-CTLA4','C10_CD4-CXCL13','C05_CD8-GZMK','C11_CD4-GNLY',"C09_CD4-GZMA",'C07_CD4-FOXP3','C03_CD8-SLC4A10','C01_CD8-LEF1','C06_CD4-CCR7','C02_CD8-CX3CR1'))
 ```
 
@@ -136,7 +142,7 @@ by Seurat, and then demonstrated conserved and tissue-specific marker
 lncRNAs by scLNC.
 
 ``` r
-DotFeatures(object=LNCobject,features=unique(DE_l$gene),item="majorCluster",mytitle= NULL,split.by='Tissue',mincell.peritem=15)
+DotFeatures(object=LNCobject, features=unique(DE_l$gene), item="majorCluster", mytitle=NULL, split.by='Tissue', mincell.peritem=15)
 ```
 
 <div class="figure" style="text-align: center">
@@ -154,8 +160,8 @@ databases. And lncRNA-mRNA interaction databases can infer lncRNA
 functions by related mRNAs.
 
 ``` r
-lncRNADatabase(features=LNCobject@ gene.list$ lncRNA)
-lncRNA_mRNADatabase(features=LNCobject@ gene.list$ lncRNA)
+lncRNADatabase(features=LNCobject@ gene.list$lncRNA)
+lncRNA_mRNADatabase(features=LNCobject@ gene.list$lncRNA)
 ```
 
 <div class="figure" style="text-align: center">
@@ -190,9 +196,9 @@ tissue data.
 
 ``` r
 LNCobject.list <- splitLRAT(LNCobject, split.item='Tissue')
-rdata_T=CaculateCorelation(object=LNCobject.list[['T']],fileName='T')
-rdata_N=CaculateCorelation(object=LNCobject.list[['N']],fileName='N')
-rdata_P=CaculateCorelation(object=LNCobject.list[['P']],fileName='P')
+rdata_T <- CaculateCorelation(object=LNCobject.list[['T']], fileName='T')
+rdata_N <- CaculateCorelation(object=LNCobject.list[['N']], fileName='N')
+rdata_P <- CaculateCorelation(object=LNCobject.list[['P']], fileName='P')
 ```
 
 The output results of the above coexpression calculation were read in,
@@ -201,8 +207,8 @@ displayed through scLNC. Pairs were divided into four groups based on
 the genomic distance between lncRNA and mRNA (titrated colors).
 
 ``` r
-CoexpPairs_cis_cor=read.csv("new_T_lm.csv",head=TRUE,stringsAsFactors=FALSE)
-CoexpPairs=CoexpPairs_cis_cor[,c('cor','locus_distance_range')]
+CoexpPairs_cis_cor <- read.csv("new_T_lm.csv", head=TRUE, stringsAsFactors=FALSE)
+CoexpPairs <- CoexpPairs_cis_cor[,c('cor','locus_distance_range')]
 CorDensity(CoexpPairs)
 ```
 
@@ -220,12 +226,12 @@ Users can filter the lncRNA-mRNA pairs with high correlation
 coefficients as co-expression pairs according to the data.
 
 ``` r
-LNCobject_T=LNCobject.list[['T']]
-LNCobject_N=LNCobject.list[['N']]
-T=read.csv("new_T_lm.csv",head=TRUE,stringsAsFactors=FALSE)
-N=read.csv("new_N_lm.csv",head=TRUE,stringsAsFactors=FALSE)
-LNCobject_T=FilterPairs(da ta=rdata_T, object=LNCobject_T,corcut=mean(T$cor)+3*sd(T$cor),RPSL=FALSE,targetcut=0)
-LNCobject_N=FilterPairs(da ta=rdata_N, object=LNCobject_N,corcut=mean(N$cor)+3*sd(N$cor),RPSL=FALSE,targetcut=0)
+LNCobject_T <- LNCobject.list[['T']]
+LNCobject_N <- LNCobject.list[['N']]
+T <- read.csv("new_T_lm.csv", head=TRUE, stringsAsFactors=FALSE)
+N <- read.csv("new_N_lm.csv", head=TRUE, stringsAsFactors=FALSE)
+LNCobject_T <- FilterPairs(data=rdata_T, object=LNCobject_T, corcut=mean(T$cor)+3*sd(T$cor), RPSL=FALSE, targetcut=0)
+LNCobject_N <- FilterPairs(data=rdata_N, object=LNCobject_N, corcut=mean(N$cor)+3*sd(N$cor), RPSL=FALSE, targetcut=0)
 ```
 
 LncRNA and its paired mRNAs were defined as a functional unit. Bar plot
@@ -233,7 +239,7 @@ shows the number of the mRNAs in each lncRNA unit in tumor and normal
 tissue.
 
 ``` r
-bar_stat_units(object.list=LNCobject.list[c('T','N')])
+bar_stat_units(object.list=LNCobject.list[c('T', 'N')])
 ```
 
 <div class="figure" style="text-align: center">
@@ -251,15 +257,15 @@ interaction support, triple helix interactions with DNA, known database
 study information), and TF and cytokine annotation of genes.
 
 ``` r
-LNCobject_T=PairsAnnotation(object=LNCobject_T,Seq=TRUE,Enhancer=TRUE, Promoter=TRUE,TF=TRUE,cytokine=TRUE,LMpairs=TRUE)
+LNCobject_T <- PairsAnnotation(object=LNCobject_T, Seq=TRUE, Enhancer=TRUE, Promoter=TRUE, TF=TRUE, cytokine=TRUE, LMpairs=TRUE)
 ```
 
 Statistics on the percentage of Enhancer, Promoter and sequence-based
 identification of lncRNAs-mRNAs in tumor and normal tissue.
 
 ``` r
-sta_target33(LNCobject_T@ link.data$ pairs)+ labs( title = "T")
-sta_target33(LNCobject_N@ link.data$ pairs)+ labs( title = "N")
+sta_target33(LNCobject_T@ link.data$ pairs)+ labs( title="T")
+sta_target33(LNCobject_N@ link.data$ pairs)+ labs( title="N")
 ```
 
 <div class="figure" style="text-align: center">
@@ -278,12 +284,10 @@ the correlation of lncRNA and mRNA was direct or mediated by other
 mRNAs。
 
 ``` r
-corrlist=CoexpPairs
-ID = 'ENSG00000268066'
-end = unique((corrlist %>% dplyr::filter(simple_type.x == 'lncRNA',simple_type.y == 'mRNA', row == lncID))$column)
-corrlist_shortPath = getShortPath(lncID=ID, endpoints=end,corrlist=CoexpPairs)
+end <- unique((CoexpPairs %>% dplyr::filter(simple_type.x == 'lncRNA', simple_type.y == 'mRNA', row == lncID))$column)
+corrlist_shortPath <- getShortPath(lncID='ENSG00000268066', endpoints=end, corrlist=CoexpPairs)
 draw_shortPath(corrlist_shortPath)
-stats_indirect_pairs(corrlist)
+stats_indirect_pairs(corrlist=CoexpPairs)
 ```
 
 <div class="figure" style="text-align: center">
@@ -301,15 +305,15 @@ We defined a lncRNA and its co-expressed mRNAs as a lncRNA unit. To
 determine in which cells each unit is active, we used AUCell.
 
 ``` r
-LNCobject_T <- AUCell_score(object=LNCobject_T,lnclist = NULL)
+LNCobject_T <- AUCell_score(object=LNCobject_T, lnclist=NULL)
 ```
 
 To determine in which cell types each cell was active, we performed an
 analysis of differences between cell types using the mean AUC score.
 
 ``` r
-LNCobject_T <- DeActivity(object=LNCobject_T,item='majorCluster',FC=0.1,pvalue=0.05,min.pct=0.3,padj=1)
-HeatmapPlot(object=LNCobject_T,items=c("majorCluster","Patient"),features=gtfid2genename(unique(LNCobject_T@ gene.list$DEAUC$gene),gtf.info = scLNCgencode),mytitle="T activity")
+LNCobject_T <- DeActivity(object=LNCobject_T, item='majorCluster', FC=0.1, pvalue=0.05, min.pct=0.3, padj=1)
+HeatmapPlot(object=LNCobject_T, items=c("majorCluster","Patient"), features=gtfid2genename(unique(LNCobject_T@ gene.list$DEAUC$gene),gtf.info=scLNCgencode), mytitle="T activity")
 ```
 
 <div class="figure" style="text-align: center">
@@ -330,7 +334,7 @@ The sames and differences of mRNAs coexpressed with lncRNA in an unit
 between tumor and normal tissue.
 
 ``` r
-display_unit(object.list=LNCobject.list[c('T','N')],myunit='LINC00861';corcut1=0.6;corcut2=0.78)
+display_unit(object.list=LNCobject.list[c('T','N')], myunit='LINC00861', corcut1=0.6, corcut2=0.78)
 ```
 
 <div class="figure" style="text-align: center">
@@ -348,7 +352,7 @@ Input the list of mRNAs co-expressed with LINC00861 in different tissues
 metascape based on this list (Go2Group_LINC00861).
 
 ``` r
-lnc_network(GO_file=Go2Group_LINC00861,genelist=Gene2Group_LINC00861,lncRNA='LINC00861')
+lnc_network(GO_file=Go2Group_LINC00861, genelist=Gene2Group_LINC00861, lncRNA='LINC00861')
 ```
 
 <div class="figure" style="text-align: center">
