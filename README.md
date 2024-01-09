@@ -6,6 +6,9 @@
 Our manuscript published at Cancer Letters can be found
 [here](https://www.sciencedirect.com/science/article/pii/S0304383523002707?via%3Dihub).
 
+Lei Y, Meng Q, Hong F, Zhao M, Gao X. Pan-cancer survey of lncRNA rewiring and functional alternation in tumor-infiltrating T cell by scLNC.
+Cancer Lett. 2023 Aug 10;569:216319. doi: 10.1016/j.canlet.2023.216319. Epub 2023 Jul 17. PMID: 37468058.
+
 ## Preparatory work
 
 ### Installation
